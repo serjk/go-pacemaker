@@ -29,7 +29,7 @@ Major missing features:
 * History information
 * Meta information about agents etc.
 
-## RUN UNIT TEST
+## RUN UNIT TESTS
 
 To run the tests just run simple command :
 
