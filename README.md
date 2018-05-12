@@ -29,20 +29,11 @@ Major missing features:
 * History information
 * Meta information about agents etc.
 
-## Compilation
+## RUN UNIT TEST
 
-The compile-time dependencies are Pacemaker, glib 2.0 and libxml2.
+To run the tests just run simple command :
 
-On openSUSE and similar distributions, this will get you all the
-dependencies needed to compile:
-
-    zypper in libpacemaker-devel libxml2-devel glib2-devel
-
-To run the tests, the pacemaker schema files need to be available as
-well. These are usually packaged separately, so to get these, you will
-need to install the `pacemaker` package as well:
-
-    zypper in pacemaker
+    make test
 
 ## Usage
 
