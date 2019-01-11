@@ -1,0 +1,46 @@
+<cib crm_feature_set="3.0.10" validate-with="pacemaker-2.5" epoch="93" num_updates="0" admin_epoch="0"
+     update-origin="sp-5-70" update-client="cibadmin" update-user="root" have-quorum="1"
+     cib-last-written="Fri Feb  2 10:14:22 2018" dc-uuid="168428861">
+    <configuration>
+        <crm_config>
+            <cluster_property_set id="cib-bootstrap-options">
+                <nvpair name="have-watchdog" value="false" id="cib-bootstrap-options-have-watchdog"/>
+                <nvpair name="cluster-infrastructure" value="corosync"
+                        id="cib-bootstrap-options-cluster-infrastructure"/>
+                <nvpair name="cluster-name" value="tatlin-ha" id="cib-bootstrap-options-cluster-name"/>
+                <nvpair name="no-quorum-policy" value="ignore" id="cib-bootstrap-options-no-quorum-policy"/>
+                <nvpair name="stonith-enabled" value="false" id="cib-bootstrap-options-stonith-enabled"/>
+                <nvpair name="start-failure-is-fatal" value="false" id="cib-bootstrap-options-start-failure-is-fatal"/>
+                <nvpair name="cluster-recheck-interval" value="1m" id="cib-bootstrap-options-cluster-recheck-interval"/>
+                <nvpair id="cib-bootstrap-options-dc-version" name="dc-version" value="1.1.15-21.1-e174ec8"/>
+            </cluster_property_set>
+        </crm_config>
+        <nodes>
+            <node id="xxx" uname="c001n01" type="normal"/>
+            <node id="yyy" uname="c001n02" type="normal"/>
+            <node id="zzz" uname="c001n03" type="normal"/>
+        </nodes>
+        <resources>
+            <clone id="res-clone">
+                <primitive id="res" class="systemd" type="res-type">
+                    <operations>
+                        <op name="stop" interval="0" timeout="100" id="res-stop-20"/>
+                        <op name="start" interval="0" timeout="100" id="res-start-20"/>
+                        <op name="monitor" interval="20" timeout="20" id="res-monitor-20"/>
+                    </operations>
+                </primitive>
+                <meta_attributes id="res-clone-meta_attributes">
+                    <nvpair id="res-clone-meta_attributes-target-role" name="target-role" value="Started"/>
+                </meta_attributes>
+            </clone>
+        </resources>
+        <constraints>
+        </constraints>
+        <rsc_defaults>
+            <meta_attributes id="rsc-options">
+                <nvpair name="migration-threshold" value="5" id="rsc-options-migration-threshold"/>
+                <nvpair name="failure-timeout" value="1m" id="rsc-options-failure-timeout"/>
+            </meta_attributes>
+        </rsc_defaults>
+    </configuration>
+</cib>

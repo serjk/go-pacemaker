@@ -1,5 +1,5 @@
 CI_DOCKER_IMAGE ?= serjk/opensuse-go-pacemaker
-WD_PATH ?=/opt/go/src/github.com/krig/go-pacemaker/
+WD_PATH ?=/opt/go/src/github.com/serjk/go-pacemaker/
 PWD = $(shell pwd)
 
 docker:

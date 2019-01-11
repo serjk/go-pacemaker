@@ -1,7 +1,7 @@
 // The pacemaker package provides an API for reading the Pacemaker cluster configuration (CIB).
 // Copyright (C) 2017 Kristoffer Gronlund <kgronlund@suse.com>
 // See LICENSE for license.
-package pacemaker
+package impl
 
 /*
 #cgo LDFLAGS: -Wl,-unresolved-symbols=ignore-all
@@ -22,6 +22,10 @@ package pacemaker
 extern int go_cib_signon(cib_t* cib, const char* name, enum cib_conn_type type);
 extern int go_cib_signoff(cib_t* cib);
 extern int go_cib_query(cib_t * cib, const char *section, xmlNode ** output_data, int call_options);
+extern int go_cib_create(cib_t * cib, const char *section, xmlNode * data, int call_options);
+extern int go_cib_update(cib_t * cib, const char *section, xmlNode * data, int call_options);
+extern int go_cib_replace(cib_t * cib, const char *section, xmlNode * data, int call_options);
+extern int go_cib_delete(cib_t * cib, const char *section, xmlNode * data, int call_options);
 extern unsigned int go_cib_register_notify_callbacks(cib_t * cib);
 extern void go_add_idle_scheduler(GMainLoop* loop);
 
@@ -45,6 +49,30 @@ int go_cib_signoff(cib_t* cib) {
 int go_cib_query(cib_t * cib, const char *section, xmlNode ** output_data, int call_options) {
 	int rc;
 	rc = cib->cmds->query(cib, section, output_data, call_options);
+	return rc;
+}
+
+int go_cib_create(cib_t * cib, const char *section, xmlNode * data, int call_options) {
+	int rc;
+	rc = cib->cmds->create(cib, section, data, call_options);
+	return rc;
+}
+
+int go_cib_update(cib_t * cib, const char *section, xmlNode * data, int call_options) {
+	int rc;
+	rc = cib->cmds->update(cib, section, data, call_options);
+	return rc;
+}
+
+int go_cib_replace(cib_t * cib, const char *section, xmlNode * data, int call_options) {
+	int rc;
+	rc = cib->cmds->replace(cib, section, data, call_options);
+	return rc;
+}
+
+int go_cib_delete(cib_t * cib, const char *section, xmlNode * data, int call_options) {
+	int rc;
+	rc = cib->cmds->delete(cib, section, data, call_options);
 	return rc;
 }
 
@@ -102,4 +130,3 @@ void go_add_idle_scheduler(GMainLoop* loop) {
 
 */
 import "C"
-

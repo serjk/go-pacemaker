@@ -37,6 +37,6 @@ To run the tests just run simple command :
 
 ## Usage
 
-To include the library, import `github.com/krig/go-pacemaker`.
+To include the library, import `github.com/serjk/go-pacemaker`.
 
-See `pacemaker_test.go` for usage examples.
+See `./impl/pacemaker_test.go` for usage examples.

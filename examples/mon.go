@@ -1,11 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
-	"time"
-	"flag"
-	"github.com/krig/go-pacemaker"
+
+	. "github.com/serjk/go-pacemaker"
+	"github.com/serjk/go-pacemaker/impl"
 )
 
 var f_verbose = flag.Bool("verbose", false, "print whole cib on each update")
@@ -16,13 +17,13 @@ var f_user = flag.String("user", "hacluster", "remote user to connect as")
 var f_password = flag.String("password", "", "remote password to connect with")
 var f_encrypted = flag.Bool("encrypted", false, "set if remote connection is encrypted")
 
-func listenToCib(cib *pacemaker.Cib, restarter chan int) {
-	_, err := cib.Subscribe(func(event pacemaker.CibEvent, doc *pacemaker.CibDocument) {
-		if event == pacemaker.UpdateEvent {
+func listenToCib(c CibClient, restarter chan int) {
+	_, err := c.Subscribe(func(event CibEvent, doc *CibDocument) {
+		if event == UpdateEvent {
 			fmt.Printf("\n")
 			fmt.Printf("event: %s\n", event)
 			if *f_verbose {
-				fmt.Printf("cib: %s\n", doc.ToString())
+				fmt.Printf("cib: %s\n", string(doc.Xml()))
 			}
 		} else {
 			log.Printf("lost connection: %s\n", event)
@@ -34,62 +35,50 @@ func listenToCib(cib *pacemaker.Cib, restarter chan int) {
 	}
 }
 
-func connectToCib() (*pacemaker.Cib, error) {
-	var cib *pacemaker.Cib
+func connectToCib() (CibClient, error) {
+	var c CibClient
 	var err error
 	if *f_file != "" {
-		cib, err = pacemaker.OpenCib(pacemaker.FromFile(*f_file))
+		c, err = impl.NewCibClientImpl(impl.FromFile(*f_file))
 	} else if *f_remote != "" {
-		cib, err = pacemaker.OpenCib(pacemaker.FromRemote(*f_remote, *f_user, *f_password, *f_port, *f_encrypted))
+		c, err = impl.NewCibClientImpl(impl.FromRemote(*f_remote, *f_user, *f_password, *f_port, *f_encrypted))
 	} else {
-		cib, err = pacemaker.OpenCib()
+		c, err = impl.NewCibClientImpl(impl.ForCommand)
 	}
 	if err != nil {
 		log.Print("Failed to open CIB")
 		return nil, err
 	}
 
-	doc, err := cib.Query()
+	err = c.Connect()
+	if err != nil {
+		log.Print("Failed connection to CIB")
+		return nil, err
+	}
+
+	doc, err := c.Query()
 	if err != nil {
 		log.Print("Failed to query CIB")
 		return nil, err
 	}
-	defer doc.Close()
 	if *f_verbose {
-		fmt.Printf("CIB: %s\n", doc.ToString())
+		fmt.Printf("CIB: %s\n", string(doc.Xml()))
 	}
-	return cib, nil
+	return c, nil
 }
 
 func main() {
 	flag.Parse()
-	
-	restarter := make(chan int)
 
 	cib, err := connectToCib()
 	if err != nil {
-		log.Printf("Failed in connectToCib: %s", err)
-	} else {
-		listenToCib(cib, restarter)
+		log.Fatal(err)
 	}
-	go pacemaker.Mainloop()
-	state := 0
-	for {
-		if state == 0 {
-			state = <-restarter
-		} else if state == 1 {
-			if cib != nil {
-				cib.Close()
-				cib = nil
-			}
-			cib, err = connectToCib()
-			if err != nil {
-				log.Printf("Failed in connectToCib: %s", err)
-				time.Sleep(5 * time.Second)
-			} else {
-				listenToCib(cib, restarter)
-				state = 0
-			}
-		}
+	info, err := cib.Query()
+
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		//return
 	}
+	fmt.Printf("%s\n", string(info.Xml()))
 }
